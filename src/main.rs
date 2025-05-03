@@ -36,6 +36,7 @@ fn main() -> Result<()> {
 
         // Export the new shows to a file
         export_file(&current_shows)?;
+        println!("Saved to {}", FILE_NAME);
     } else {
         println!("No new show found.");
     }
@@ -104,7 +105,6 @@ fn export_file(shows_vec: &Vec<Show>) -> Result<()> {
 
     // Save to file
     std::fs::write(FILE_NAME, json)?;
-    println!("Saved to {}", FILE_NAME);
     Ok(())
 }
 
