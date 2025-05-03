@@ -2,12 +2,23 @@ use crate::{ENDPOINT_URLS, HtmaError};
 use chrono::{NaiveDate, NaiveTime};
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy, Serialize, Deserialize, PartialOrd)]
 pub enum Category {
     None,
     Comedy,
     Music,
+}
+
+impl Display for Category {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Category::None => write!(f, "None"),
+            Category::Comedy => write!(f, "Comedy"),
+            Category::Music => write!(f, "Music"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, PartialOrd)]
@@ -28,6 +39,17 @@ impl Show {
         }
     }
 }
+
+impl Display for Show {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Title: {}, Date: {}, Time: {}, Category: {}",
+            self.title, self.date, self.time, self.category
+        )
+    }
+}
+
 /// Parses a Hebrew date string into a `NaiveDate`.
 ///
 /// # Arguments
