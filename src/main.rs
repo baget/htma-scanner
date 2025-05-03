@@ -28,21 +28,42 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    if let Some(new_shows) = check_for_new_shows(prev_shows_vec, &current_shows) {
+        println!("New shows found:");
+        for show in &new_shows {
+            println!("{}", show);
+        }
+
+        // Export the new shows to a file
+        export_file(&current_shows)?;
+    } else {
+        println!("No new show found.");
+    }
+
+    Ok(())
+}
+
+/// Compares two lists of shows and identifies new shows in the current list.
+///
+/// # Arguments
+/// * `prev_shows_vec` - A vector of `Show` objects representing the previous list of shows.
+/// * `current_shows` - A reference to a vector of `Show` objects representing the current list of shows.
+///
+/// # Returns
+/// * `Option<Vec<Show>>` - Returns `Some(Vec<Show>)` containing the new shows if there are any, or `None` if no new shows are found.
+///
+/// # Behavior
+/// * Retains only the shows in `current_shows` that are not present in `prev_shows_vec`.
+/// * Returns `None` if no new shows are found.
+fn check_for_new_shows(prev_shows_vec: Vec<Show>, current_shows: &Vec<Show>) -> Option<Vec<Show>> {
     // Print only different shows
     let mut new_shows = current_shows.clone();
     new_shows.retain(|new_show| !prev_shows_vec.iter().any(|old_show| old_show == new_show));
     if new_shows.is_empty() {
-        println!("No new show found.");
-        return Ok(());
-    }
-    println!("New shows found:");
-    for show in &new_shows {
-        println!("{}", show);
+        return None;
     }
 
-    export_file(&current_shows)?;
-
-    Ok(())
+    Some(new_shows)
 }
 
 /// Retrieves a list of shows from multiple categories.
