@@ -412,7 +412,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
-    "urlencoding",
+ "urlencoding",
 ]
 
 [[package]]
