@@ -1,8 +1,24 @@
-use crate::{ENDPOINT_URLS, HtmaError};
+use crate::HtmaError;
 use chrono::{NaiveDate, NaiveTime};
+use once_cell::sync::Lazy;
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fmt::Display;
+
+// Create a static HashMap that's initialized on first access
+static ENDPOINT_URLS: Lazy<HashMap<Category, &'static str>> = Lazy::new(|| {
+    let mut map = HashMap::new();
+    map.insert(
+        Category::Comedy,
+        "https://htma.smarticket.co.il/%D7%91%D7%99%D7%93%D7%95%D7%A8",
+    );
+    map.insert(
+        Category::Music,
+        "https://htma.smarticket.co.il/%D7%9E%D7%95%D7%A1%D7%99%D7%A7%D7%94",
+    );
+    map
+});
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy, Serialize, Deserialize, PartialOrd)]
 pub enum Category {
