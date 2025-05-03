@@ -3,6 +3,8 @@ mod shows;
 use crate::shows::Category;
 use crate::shows::{Show, get_shows_by_category};
 use anyhow::Result;
+use std::env;
+use urlencoding::encode;
 
 const FILE_NAME: &str = "shows.json";
 
@@ -33,6 +35,16 @@ fn main() -> Result<()> {
         for show in &new_shows {
             println!("{}", show);
         }
+
+        let msg = format!(
+            "*הופעות חדשות*:\n{}",
+            new_shows
+                .iter()
+                .map(|s| format!("{} 🔛 `{} ({})`", s.title, s.date, s.time))
+                .collect::<Vec<_>>()
+                .join("\r\n")
+        );
+        notify(msg)?;
 
         // Export the new shows to a file
         export_file(&current_shows)?;
@@ -122,4 +134,38 @@ fn import_file() -> Result<Vec<Show>> {
     // Deserialize JSON to Vec<Show>
     let shows_vec: Vec<Show> = serde_json::from_str(&json)?;
     Ok(shows_vec)
+}
+
+/// Sends a notification message via Telegram.
+///
+/// # Arguments
+/// * `text` - A `String` containing the message to be sent.
+///
+/// # Returns
+/// * `Result<()>` - Returns `Ok(())` if the notification is sent successfully, or an error if it fails.
+///
+/// # Errors
+/// * Returns an error if the `TELEGRAM_TOKEN` or `CHAT_ID` environment variables are not set.
+/// * Returns an error if the HTTP request to the Telegram API fails.
+///
+/// # Behavior
+/// * Encodes the message text to ensure it is URL-safe.
+/// * Constructs the Telegram API URL using the bot token and chat ID.
+/// * Sends the message using a blocking HTTP GET request.
+fn notify(text: String) -> Result<()> {
+    const TELEGRAM_BASE_URL: &str = "https://api.telegram.org";
+
+    let encoded = encode(&text);
+
+    let token = env::var("TELEGRAM_TOKEN")?;
+    let chat_id = env::var("CHAT_ID")?;
+
+    let url = format!(
+        "{}/bot{}/sendMessage?chat_id={}&parse_mode=Markdown&text={}",
+        TELEGRAM_BASE_URL, token, chat_id, encoded
+    );
+
+    let _resp = reqwest::blocking::get(&url)?;
+
+    Ok(())
 }
