@@ -165,7 +165,10 @@ fn notify(text: String) -> Result<()> {
         TELEGRAM_BASE_URL, token, chat_id, encoded
     );
 
+    println!("Sending notification to Telegram...");
     let _resp = reqwest::blocking::get(&url)?;
+
+    _resp.error_for_status()?;
 
     Ok(())
 }
